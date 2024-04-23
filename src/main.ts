@@ -3,16 +3,16 @@ import Router from "@koa/router"
 import { bodyParser } from "@koa/bodyparser"
 import logger from "koa-logger"
 import cors from "@koa/cors"
-import { z } from "zod"
+import { RecipeSchema } from "./Recipe.js"
+import { RecipeRepositoryMemory } from "./RecipeRepositoryMemory.js"
+import { SearchRecipes } from "./SearchRecipes.js"
+import { SearchRecipe } from "./CreateRecipes.js"
+import { DeleteRecipe } from "./DeleteRecipe.js"
 
-const RecipeSchema = z.object({
-  name: z.string(),
-  description: z.string(),
-})
-
-type Recipe = z.infer<typeof RecipeSchema>
-
-const recipeRepository = new Map<string, Recipe>()
+const recipeRepository = new RecipeRepositoryMemory()
+const searchRecipes = new SearchRecipes(recipeRepository)
+const createRecipe = new SearchRecipe(recipeRepository)
+const deleteRecipe = new DeleteRecipe(recipeRepository)
 
 const app = new Koa()
 
@@ -23,29 +23,17 @@ app.use(logger())
 const router = new Router()
 
 router
-  .get("/recipes", (ctx) => {
-    ctx.body = Array.from(recipeRepository.values())
+  .get("/recipes", async (ctx) => {
+    ctx.body = await searchRecipes.search()
   })
-  .post("/recipes", (ctx) => {
+  .post("/recipes", async (ctx) => {
     const recipe = RecipeSchema.parse(ctx.request.body)
-
-    if (recipeRepository.has(recipe.name)) {
-      ctx.status = 409
-      return
-    }
-
-    recipeRepository.set(recipe.name, recipe)
+    await createRecipe.create(recipe.name, recipe.description)
     ctx.status = 201
   })
-  .delete("/recipes/:name", (ctx) => {
-    const { name } = ctx.params
-
-    if (!recipeRepository.has(name)) {
-      ctx.status = 404
-      return
-    }
-
-    recipeRepository.delete(name)
+  .delete("/recipes/:name", async (ctx) => {
+    const name = ctx.params.name
+    await deleteRecipe.delete(name)
     ctx.status = 204
   })
 
