@@ -55,7 +55,7 @@ exports[`HandleErrorMiddleware > handles RecipeNotFound 1`] = `
 exports[`HandleErrorMiddleware > handles ZodError 1`] = `
 {
   "body": {
-    "code": "invalid_params",
+    "code": "INVALID_PARAMETERS",
     "payload": [
       {
         "code": "invalid_type",
@@ -85,7 +85,7 @@ exports[`HandleErrorMiddleware > handles ZodError 1`] = `
 exports[`HandleErrorMiddleware > handles non-error thrown 1`] = `
 {
   "body": {
-    "code": "unknown_error",
+    "code": "INTERNAL_ERROR",
     "payload": "this is not an error",
     "status": "error",
   },
@@ -96,7 +96,7 @@ exports[`HandleErrorMiddleware > handles non-error thrown 1`] = `
 exports[`HandleErrorMiddleware > handles unknown Error instances 1`] = `
 {
   "body": {
-    "code": "unknown_error",
+    "code": "INTERNAL_ERROR",
     "payload": [Error: this is an unknown error],
     "status": "error",
   },
