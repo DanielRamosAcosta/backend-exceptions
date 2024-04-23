@@ -9,6 +9,10 @@ import { SearchRecipes } from "./SearchRecipes.js"
 import { SearchRecipe } from "./CreateRecipes.js"
 import { DeleteRecipe } from "./DeleteRecipe.js"
 import { ZodError } from "zod"
+import { RecipeNotFound } from "./errors/RecipeNotFound.js"
+import { EmptyRecipeName } from "./errors/EmptyRecipeName.js"
+import { EmptyRecipeDescription } from "./errors/EmptyRecipeDescription.js"
+import { RecipeAlreadyExists } from "./errors/RecipeAlreadyExists.js"
 
 const recipeRepository = new RecipeRepositoryMemory()
 const searchRecipes = new SearchRecipes(recipeRepository)
@@ -52,33 +56,44 @@ app.use(async (ctx, next) => {
       return
     }
     if (err instanceof Error) {
-      if (err.message.match(/does not exist/)) {
+      if (err instanceof RecipeNotFound) {
         ctx.status = 404
         ctx.body = {
           status: "error",
-          code: "recipe_not_found",
+          code: err.code,
           payload: {
             message: err.message,
           },
         }
         return
       }
-      if (err.message.match(/Recipe name cannot be empty/)) {
+      if (err instanceof EmptyRecipeName) {
         ctx.status = 400
         ctx.body = {
           status: "error",
-          code: "recipe_name_must_not_be_empty",
+          code: err.code,
           payload: {
             message: err.message,
           },
         }
         return
       }
-      if (err.message.match(/Recipe description cannot be empty/)) {
+      if (err instanceof EmptyRecipeDescription) {
         ctx.status = 400
         ctx.body = {
           status: "error",
-          code: "recipe_description_must_not_be_empty",
+          code: err.code,
+          payload: {
+            message: err.message,
+          },
+        }
+        return
+      }
+      if (err instanceof RecipeAlreadyExists) {
+        ctx.status = 409
+        ctx.body = {
+          status: "error",
+          code: err.code,
           payload: {
             message: err.message,
           },
