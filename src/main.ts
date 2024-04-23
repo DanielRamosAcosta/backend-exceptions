@@ -8,11 +8,7 @@ import { RecipeRepositoryMemory } from "./RecipeRepositoryMemory.js"
 import { SearchRecipes } from "./SearchRecipes.js"
 import { SearchRecipe } from "./CreateRecipes.js"
 import { DeleteRecipe } from "./DeleteRecipe.js"
-import { ZodError } from "zod"
-import { RecipeNotFound } from "./errors/RecipeNotFound.js"
-import { EmptyRecipeName } from "./errors/EmptyRecipeName.js"
-import { EmptyRecipeDescription } from "./errors/EmptyRecipeDescription.js"
-import { RecipeAlreadyExists } from "./errors/RecipeAlreadyExists.js"
+import { handleErrorMiddleware } from "./errors/HandleErrorMiddleware.js"
 
 const recipeRepository = new RecipeRepositoryMemory()
 const searchRecipes = new SearchRecipes(recipeRepository)
@@ -42,81 +38,7 @@ router
     ctx.status = 204
   })
 
-app.use(async (ctx, next) => {
-  try {
-    await next()
-  } catch (err: unknown) {
-    if (err instanceof ZodError) {
-      ctx.status = 400
-      ctx.body = {
-        status: "error",
-        code: "invalid_params",
-        payload: err.errors,
-      }
-      return
-    }
-    if (err instanceof Error) {
-      if (err instanceof RecipeNotFound) {
-        ctx.status = 404
-        ctx.body = {
-          status: "error",
-          code: err.code,
-          payload: {
-            message: err.message,
-          },
-        }
-        return
-      }
-      if (err instanceof EmptyRecipeName) {
-        ctx.status = 400
-        ctx.body = {
-          status: "error",
-          code: err.code,
-          payload: {
-            message: err.message,
-          },
-        }
-        return
-      }
-      if (err instanceof EmptyRecipeDescription) {
-        ctx.status = 400
-        ctx.body = {
-          status: "error",
-          code: err.code,
-          payload: {
-            message: err.message,
-          },
-        }
-        return
-      }
-      if (err instanceof RecipeAlreadyExists) {
-        ctx.status = 409
-        ctx.body = {
-          status: "error",
-          code: err.code,
-          payload: {
-            message: err.message,
-          },
-        }
-        return
-      }
-
-      ctx.status = 500
-      ctx.body = {
-        status: "error",
-        code: "unknown_error",
-        payload: err,
-      }
-    }
-
-    ctx.status = 500
-    ctx.body = {
-      status: "error",
-      code: "unknown_error",
-      payload: err,
-    }
-  }
-})
+app.use(handleErrorMiddleware)
 
 app.use(router.routes()).use(router.allowedMethods())
 

@@ -1,0 +1,105 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`HandleErrorMiddleware > handles EmptyRecipeDescription 1`] = `
+{
+  "body": {
+    "code": "RECIPE_DESCRIPTION_CANNOT_BE_EMPTY",
+    "payload": {
+      "message": "Recipe description cannot be empty",
+    },
+    "status": "error",
+  },
+  "status": 400,
+}
+`;
+
+exports[`HandleErrorMiddleware > handles EmptyRecipeName 1`] = `
+{
+  "body": {
+    "code": "RECIPE_NAME_CANNOT_BE_EMPTY",
+    "payload": {
+      "message": "Recipe name cannot be empty",
+    },
+    "status": "error",
+  },
+  "status": 400,
+}
+`;
+
+exports[`HandleErrorMiddleware > handles RecipeAlreadyExists 1`] = `
+{
+  "body": {
+    "code": "RECIPE_ALREADY_EXISTS",
+    "payload": {
+      "message": "Recipe already exists",
+    },
+    "status": "error",
+  },
+  "status": 409,
+}
+`;
+
+exports[`HandleErrorMiddleware > handles RecipeNotFound 1`] = `
+{
+  "body": {
+    "code": "RECIPE_NOT_FOUND",
+    "payload": {
+      "message": "Recipe not found",
+    },
+    "status": "error",
+  },
+  "status": 404,
+}
+`;
+
+exports[`HandleErrorMiddleware > handles ZodError 1`] = `
+{
+  "body": {
+    "code": "invalid_params",
+    "payload": [
+      {
+        "code": "invalid_type",
+        "expected": "string",
+        "message": "Required",
+        "path": [
+          "name",
+        ],
+        "received": "undefined",
+      },
+      {
+        "code": "invalid_type",
+        "expected": "string",
+        "message": "Required",
+        "path": [
+          "description",
+        ],
+        "received": "undefined",
+      },
+    ],
+    "status": "error",
+  },
+  "status": 400,
+}
+`;
+
+exports[`HandleErrorMiddleware > handles non-error thrown 1`] = `
+{
+  "body": {
+    "code": "unknown_error",
+    "payload": "this is not an error",
+    "status": "error",
+  },
+  "status": 500,
+}
+`;
+
+exports[`HandleErrorMiddleware > handles unknown Error instances 1`] = `
+{
+  "body": {
+    "code": "unknown_error",
+    "payload": [Error: this is an unknown error],
+    "status": "error",
+  },
+  "status": 500,
+}
+`;
