@@ -1,20 +1,23 @@
 import { RecipeRepository } from "./RecipeRepository.js"
 import { Recipe } from "./Recipe.js"
+import { EmptyRecipeName } from "./errors/EmptyRecipeName.js"
+import { EmptyRecipeDescription } from "./errors/EmptyRecipeDescription.js"
+import { RecipeAlreadyExists } from "./errors/RecipeAlreadyExists.js"
 
 export class SearchRecipe {
   constructor(private readonly recipeRepository: RecipeRepository) {}
 
   async create(name: string, description: string) {
     if (await this.recipeRepository.exists(name)) {
-      throw new Error(`Recipe ${name} already exists`)
+      throw new RecipeAlreadyExists()
     }
 
     if (!name) {
-      throw new Error("Recipe name cannot be empty")
+      throw new EmptyRecipeName()
     }
 
     if (!description) {
-      throw new Error("Recipe description cannot be empty")
+      throw new EmptyRecipeDescription()
     }
 
     const recipe: Recipe = {
